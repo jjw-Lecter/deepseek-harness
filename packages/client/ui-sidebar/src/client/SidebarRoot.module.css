@@ -154,6 +154,15 @@
   letter-spacing: 0.04em;
 }
 
+/* The brand-adjacent status seat. Flex-none, so a cell takes its own width
+   and the brand group (flex 1, min-width 0) yields instead of the controls. */
+.brandStatus {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
 .fallbackBrandName {
   font-size: 17px;
   letter-spacing: 0px;

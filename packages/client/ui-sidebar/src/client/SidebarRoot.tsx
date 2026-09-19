@@ -6,10 +6,12 @@
  * mid-slide. At settle the wide-only content unmounts and the upper
  * controls enter the 56px rail from the same horizontal offset (one icon each,
  * same top-down order) on one fade that ends with the slide. The bottom-pinned
- * settings control only fades. The workspace/session browsing region between
- * global panel rows and the foot is the `sidebar.workspaces` registrant's,
- * and the foot holds `sidebar.settings` plus `sidebar.footer.action`; the shell
- * hands them the wide flag (plus an expand request callback for the browser).
+ * settings control only fades. The launch actions under New Session are the
+ * `sidebar.quickstart` registrant's, the workspace/session browsing region
+ * between global panel rows and the foot is the `sidebar.workspaces`
+ * registrant's, and the foot holds `sidebar.settings` plus
+ * `sidebar.footer.action`; the shell hands them the wide flag (plus an expand
+ * request callback for the browser).
  *
  * The column also owns whether the scroll regions nested in it draw a
  * scrollbar at all: the shell tracks the pointer and rebinds ui-theme's
@@ -206,6 +208,14 @@ export function SidebarRoot({
             </span>
           </button>
         )}
+        {/* Beside the brand group rather than inside it: the brand button is
+            the New Session shortcut, so a status cell must not sit in its hit
+            area. The rail has no room for text and renders no seat here. */}
+        {wide && (
+          <span className={css.brandStatus}>
+            {renderSlot('sidebar.brand.status', {})}
+          </span>
+        )}
         {/* Rail resting state is the whale mark; hovering swaps in the panel
             icon (the expand affordance, figma sidebar-hover flow). */}
         <Tooltip label={collapsed ? t('toggle.open') : t('toggle.collapse')} delayMs={500}>
@@ -238,6 +248,8 @@ export function SidebarRoot({
           {wide && <span className={clsx(css.newSessionLabel, css.wide)}>{t('session.new')}</span>}
         </button>
       </Tooltip>
+
+      {renderSlot('sidebar.quickstart', { wide })}
 
       {panels.length > 0 && (
         <nav className={css.panelList} aria-label={t('panels.label')}>

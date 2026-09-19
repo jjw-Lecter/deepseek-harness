@@ -442,6 +442,71 @@ export interface Config {
 
 来源：[`packages/client/hmr/src/index.ts:31`](../packages/client/hmr/src/index.ts)
 
+<a id="deepseek-aidsh-client-ui-deepseek-balance"></a>
+
+## `@deepseek-ai/dsh-client-ui-deepseek-balance`
+
+需要：`connection` 路 `credentials`
+
+```ts config-catalog
+/**
+ * Plugin config, validated by the same-named schemastery schema. The row this
+ * package is mounted from states which credential and endpoint the balance
+ * read uses; the browser half carries no configuration, because a `dsh.client`
+ * row's `config` reaches its host half only.
+ */
+export interface Config {
+  /** Credential reference (environment-variable name) resolved per request; defaults to `DEEPSEEK_API_KEY`. */
+  readonly apiKeyEnv?: string
+  /** Endpoint base; defaults to the public API. A gateway deployment states its own root here. */
+  readonly baseURL?: string
+  /** Deadline for one provider read, in milliseconds (default 10000). */
+  readonly timeoutMs?: number
+}
+```
+
+来源：[`packages/client/ui-deepseek-balance/src/config.ts:35`](../packages/client/ui-deepseek-balance/src/config.ts)
+
+<a id="deepseek-aidsh-client-ui-quick-start"></a>
+
+## `@deepseek-ai/dsh-client-ui-quick-start`
+
+需要：`connection`
+
+```ts config-catalog
+/** Quick-start launch actions configuration. */
+export interface Config {
+  /** Launch actions in the order they render; an empty list installs nothing. */
+  actions?: QuickStartActionEntry[]
+  /**
+   * Deadline in milliseconds for a started application's page to answer; the
+   * press fails at this point, and the application keeps running.
+   * @default DEFAULT_LAUNCH_READY_MS
+   */
+  launchReadyMs?: number
+}
+
+/**
+ * One configured action as a cordis.yml row writes it. An entry states its form
+ * by the fields it carries — `prompt`, or `command` with `url` — and
+ * {@link resolveActions} rejects an entry that states both or neither.
+ */
+export interface QuickStartActionEntry {
+  /** Stable identity of the action. */
+  id: string
+  /** Button text and accessible name. */
+  label: string
+  /** Opening instruction, for an action that opens a session. */
+  prompt?: string
+  /** Program or script the host runs, for an action that starts an application. */
+  command?: string
+  /** Page the panel embeds once the application answers. */
+  url?: string
+}
+```
+
+来源：[`packages/client/ui-quick-start/src/config.ts:30`](../packages/client/ui-quick-start/src/config.ts)
+
 <a id="deepseek-aidsh-compaction-basic"></a>
 
 ## `@deepseek-ai/dsh-compaction-basic`

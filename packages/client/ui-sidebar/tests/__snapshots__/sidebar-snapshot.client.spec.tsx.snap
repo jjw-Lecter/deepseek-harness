@@ -61,6 +61,10 @@ exports[`sidebar shell snapshots > renders the collapsed rail after the crossfad
       />
     </button>
     <div
+      data-slot="sidebar.quickstart"
+      style="display: contents;"
+    />
+    <div
       class="regionArea"
     >
       <div
@@ -155,6 +159,14 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
           </span>
         </span>
       </button>
+      <span
+        class="brandStatus"
+      >
+        <div
+          data-slot="sidebar.brand.status"
+          style="display: contents;"
+        />
+      </span>
       <button
         aria-label="Collapse sidebar"
         class="iconButton toggle"
@@ -190,6 +202,10 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
         New Session
       </span>
     </button>
+    <div
+      data-slot="sidebar.quickstart"
+      style="display: contents;"
+    />
     <div
       class="regionArea"
     >
@@ -285,6 +301,14 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
           </span>
         </span>
       </button>
+      <span
+        class="brandStatus"
+      >
+        <div
+          data-slot="sidebar.brand.status"
+          style="display: contents;"
+        />
+      </span>
       <button
         aria-label="收起侧边栏"
         class="iconButton toggle"
@@ -320,6 +344,10 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
         新会话
       </span>
     </button>
+    <div
+      data-slot="sidebar.quickstart"
+      style="display: contents;"
+    />
     <div
       class="regionArea"
     >

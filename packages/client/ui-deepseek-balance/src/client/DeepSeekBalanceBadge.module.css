@@ -1,0 +1,49 @@
+/* The brand-row balance cell. A quiet filled pill: it sits beside the wordmark
+   at the same height, and its state rides the dot rather than recoloring the
+   figure the user is watching. */
+
+.badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 999px;
+  corner-shape: round;
+  background: var(--dsw-alias-fill-l2);
+  color: var(--dsw-alias-label-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 160ms ease-out, color 160ms ease-out;
+}
+
+.badge:hover,
+.badge:focus-visible {
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+.badge:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.dot {
+  flex: none;
+}
+
+.amount {
+  min-width: 0;
+}
+
+/* No figure to show yet or to keep: a placeholder rather than a zero. */
+.placeholder {
+  color: var(--dsw-alias-label-tertiary);
+}

@@ -25,11 +25,19 @@ dsh Web 客户端的侧边栏让用户识别当前构建、启动新会话、将
 <a id="use-this-package"></a>
 ## 使用本包
 
-侧边栏是导航外壳：用户看到品牌、启动新会话、折叠轨道并到达 Settings。功能插件填充它的席位——ui-workspace 填充 `sidebar.workspaces`，ui-settings 在 `sidebar.settings` 注册触发行与设置面板。
+侧边栏是导航外壳：用户看到品牌、启动新会话、折叠轨道并到达 Settings。功能插件填充它的席位——ui-workspace 填充 `sidebar.workspaces`，ui-settings 在 `sidebar.settings` 注册触发行与设置面板，部署自己的开工动作填充 `sidebar.quickstart`，DeepSeek 余额这类状态单元填充 `sidebar.brand.status`。
 
 ### 品牌与 New Session
 
 展开的品牌行把 `sidebar.brand.mark` 与 `sidebar.brand.name` 渲染为两个独立的 single slot；收起轨道则渲染同一个 mark slot。没有占位者时，外壳使用鱼形标记和本地化的本地构建标签。完整构建会在标签下方显示代码徽标；该徽标使用 `DSH_CLIENT_VERSION`、可选的 7 位 `DSH_CLIENT_COMMIT_HASH` 与 `DSH_CLIENT_GIT_DIRTY=true` 组装成 `version[-commit][-dirty]`；缺少版本元数据时不显示徽标。New Session 优先使用作用域操作明确指定的 Workspace，否则使用当前 Session 所属 Workspace，再否则使用最近活跃 Workspace；一个 Workspace 都没有时则清空选择，进入空白 New Session 页面。
+
+### 品牌状态
+
+`sidebar.brand.status` 是位于品牌组与栏折叠按钮之间、New Session 点击区域之外的 root 作用域列表。每个单元自持内容与宽度，外壳只负责摆放。该席位只存在于展开的栏中，因为 56px 轨道放不下状态单元。
+
+### 开工动作
+
+`sidebar.quickstart` 是紧贴 New Session 下方、全局面板行上方的 single root 作用域席位。没有占位者时外壳在此不绘制任何内容，并只把栏状态（`wide`）交给占位者，因此按钮集及其自身布局属于注册者。按下按钮是注册者的事务：外壳既不知道也不报告某个开工动作做了什么。
 
 ### 全局面板入口
 
@@ -51,7 +59,7 @@ dsh Web 客户端的侧边栏让用户识别当前构建、启动新会话、将
 <details>
 <summary>实现细节——点击展开</summary>
 
-外壳是纯组合：`SidebarRootComponentProps` 组合布局 owner share、全局 `useSessions` 与 `useWorkspaces` 钩子、已声明的品牌、`sidebar.workspaces` 与 `sidebar.settings` 子 slot，以及注入的导航回调。面板入口及其可选标题使用相同的组合方式。面板元数据由列表注册和 locale 变化派生；选中态属于布局存储。
+外壳是纯组合：`SidebarRootComponentProps` 组合布局 owner share、全局 `useSessions` 与 `useWorkspaces` 钩子、已声明的品牌、`sidebar.brand.status`、`sidebar.workspaces`、`sidebar.quickstart` 与 `sidebar.settings` 子 slot，以及注入的导航回调。面板入口及其可选标题使用相同的组合方式。面板元数据由列表注册和 locale 变化派生；选中态属于布局存储。
 
 ### slot 纪律
 

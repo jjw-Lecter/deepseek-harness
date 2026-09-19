@@ -220,6 +220,50 @@
     - id: ui-sidebar
       name: '@deepseek-ai/dsh-client-ui-sidebar'
 
+    # DeepSeek account balance beside the sidebar brand. The host half reads the
+    # provider's balance endpoint with this deployment's own credential; the
+    # browser cell shows the amount and re-reads it on a cadence and on press.
+    # A deployment whose credential is unconfigured shows an unconfigured cell.
+    - id: ui-deepseek-balance
+      name: '@deepseek-ai/dsh-client-ui-deepseek-balance'
+
+    # Launch actions under New Session: one button per configured starter
+    # instruction, plus the AiWAR3WorkFlow studio — the fourth starts that
+    # project's own start.bat on the host (FastAPI on 8000, Vue on 5173) and
+    # embeds the page in the central panel. This deployment points the three
+    # instructions at the GameStart studio roles under
+    # C:\Users\10639\.agents\skills\gamestart; an unconfigured deployment
+    # renders no seat.
+    - id: ui-quick-start
+      name: '@deepseek-ai/dsh-client-ui-quick-start'
+      config:
+        # Cold start clears caches, frees 8000/5173, boots Python and Vite.
+        launchReadyMs: 180000
+        actions:
+          - id: wc3-development
+            label: 开发
+            prompt: >-
+              使用 gamestart 技能开始魔兽争霸 3 RPG 开发。先读 D:\GameStart\GameStart\AGENTS.md、
+              .agents/skills/_shared/role-command.md 和 docs/gamestart-capability-evolution.md，
+              按 game-start-agent 角色推进项目，并在第一条工作上下文里给出基线 commit、目标、
+              允许修改、禁止修改、同步边界和验证方式。
+          - id: wc3-ui-design
+            label: 设计
+            prompt: >-
+              使用 gamestart 技能做魔兽争霸 3 RPG 的 UI 设计。先读 D:\GameStart\GameStart\AGENTS.md
+              和 agents/game-ui-design-agent.md，以 game-ui-design-agent 角色产出 UI 总设计，
+              按项目 UI设计 目录规范输出 UI总设计文档图 和模块规格。
+          - id: wc3-numerical-balance
+            label: 数值平衡
+            prompt: >-
+              使用 gamestart 技能做魔兽争霸 3 RPG 的数值平衡。先读 D:\GameStart\GameStart\AGENTS.md
+              和 agents/game-numerical-analysis-agent.md，以 game-numerical-analysis-agent 角色
+              按当前项目公式和时间窗给出数值基线、模拟结果与调平建议。
+          - id: aiwar3-workflow
+            label: AiWAR3 工作台
+            command: 'D:\AiWAR3WorkFlow\start.bat'
+            url: 'http://localhost:5173/'
+
     # The right Sidebar: one docking surface per session over ui-dockkit.
     - id: ui-sidebar-right
       name: '@deepseek-ai/dsh-client-ui-sidebar-right'

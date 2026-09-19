@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import type { GlobalStandardProps } from '@deepseek-ai/dsh-client-ui-slots'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import type {
-  SidebarFooterActionOwnerProps, SidebarRootComponentProps, SidebarSectionOwnerProps,
-  SidebarSettingsOwnerProps,
+  SidebarFooterActionOwnerProps, SidebarQuickstartOwnerProps, SidebarRootComponentProps,
+  SidebarSectionOwnerProps, SidebarSettingsOwnerProps,
 } from '../src/client/contract/slots.ts'
 import { SidebarRoot } from '../src/client/SidebarRoot.tsx'
 import { en } from '../src/client/locales.ts'
@@ -39,6 +39,8 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
   let regionOwner: SidebarSectionOwnerProps | undefined
   let settingsOwner: SidebarSettingsOwnerProps | undefined
   let footerActionOwner: SidebarFooterActionOwnerProps | undefined
+  let quickstartOwner: SidebarQuickstartOwnerProps | undefined
+  let brandStatusRendered = false
   const brandMark = <span data-testid="custom-brand-mark">M</span>
   const brandName = <span data-testid="custom-brand-name">Custom Brand</span>
   let current = { collapsed, width }
@@ -51,10 +53,17 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
       startSession={startSession} toggleSidebar={toggleSidebar} t={t}
       renderSlot={((
         key: string,
-        owner: SidebarFooterActionOwnerProps | SidebarSectionOwnerProps | SidebarSettingsOwnerProps,
+        owner: SidebarFooterActionOwnerProps | SidebarSectionOwnerProps
+        | SidebarSettingsOwnerProps | SidebarQuickstartOwnerProps,
       ) => {
         if (key === 'sidebar.brand.mark') return brandMark
         if (key === 'sidebar.brand.name') return brandName
+        // The brand-status seat carries a marker owner share, so the stub keys
+        // it without reading one.
+        if (key === 'sidebar.brand.status') {
+          brandStatusRendered = true
+          return <div data-testid="brand-status-seat" />
+        }
         if (key === 'sidebar.settings') {
           settingsOwner = owner
           return <div data-testid="settings-seat" data-wide={owner.wide} />
@@ -62,6 +71,10 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
         if (key === 'sidebar.footer.action') {
           footerActionOwner = owner
           return <div data-testid="footer-action-seat" data-wide={owner.wide} />
+        }
+        if (key === 'sidebar.quickstart') {
+          quickstartOwner = owner
+          return <div data-testid="quickstart-seat" data-wide={owner.wide} />
         }
         regionOwner = owner as SidebarSectionOwnerProps
         return <div data-testid="region" data-wide={owner.wide} />
@@ -84,6 +97,11 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
       if (footerActionOwner === undefined) throw new Error('footer action owner not rendered')
       return footerActionOwner
     },
+    quickstartOwner: () => {
+      if (quickstartOwner === undefined) throw new Error('quickstart owner not rendered')
+      return quickstartOwner
+    },
+    brandStatusRendered: () => brandStatusRendered,
     rerender(next: Partial<typeof current>) {
       current = { ...current, ...next }
       view.rerender(root())
@@ -105,8 +123,34 @@ describe('SidebarRoot shell', () => {
     expect(b.toggleSidebar).toHaveBeenCalledOnce()
   })
 
-  it('renders generic brand fallbacks when no package fills the slots', () => {
-    vi.stubEnv('DSH_CLIENT_COMMIT_HASH', '0123456')
+  it('renders the quick-start seat directly under New Session and rides the fold', async () => {
+    const b = mountShell()
+    const seat = screen.getByTestId('quickstart-seat')
+    expect(seat.dataset.wide).toBe('true')
+    // Directly after the capsule, before the panel rows and the regions.
+    const capsule = screen.getAllByRole('button', { name: 'New session' })[1]!
+    expect(capsule.compareDocumentPosition(seat) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    b.rerender({ collapsed: true, width: 56 })
+    // The seat rides the same fold state as the browser and the foot: wide
+    // while the fade runs, rail once the crossfade settles.
+    await waitFor(() => { expect(screen.getByTestId('quickstart-seat').dataset.wide).toBe('false') })
+  })
+
+  it('renders the brand-status seat beside the wordmark, and only while expanded', async () => {
+    const b = mountShell()
+    const seat = screen.getByTestId('brand-status-seat')
+    // After the brand group, so it sits between the wordmark and the toggle.
+    const wordmark = screen.getAllByRole('button', { name: 'New session' })[0]!
+    expect(wordmark.compareDocumentPosition(seat) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    // Outside the brand button: a status cell must not sit in the New Session hit area.
+    expect(seat.closest('button')).toBeNull()
+    // The 56px rail carries no room for a status figure, so the seat exists only
+    // in the expanded column.
+    b.rerender({ collapsed: true, width: 56 })
+    await waitFor(() => { expect(screen.queryByTestId('brand-status-seat')).toBeNull() })
+  })
+
+  it('renders generic brand fallbacks when no package fills the slots', () => {    vi.stubEnv('DSH_CLIENT_COMMIT_HASH', '0123456')
     vi.stubEnv('DSH_CLIENT_GIT_DIRTY', 'true')
     vi.stubEnv('DSH_CLIENT_VERSION', '1.2.3-rc.4')
     const { container } = render(<SidebarRoot

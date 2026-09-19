@@ -2,10 +2,12 @@
  * Sidebar slot contract: the registrant-side props composition for the
  * layout-owned `sidebar` slot, plus the holes this shell declares. The shell
  * owns column geometry, the brand row, New Session, and global panel rows;
- * everything between the workspace section header and the list bottom is the
- * `sidebar.workspaces` registrant's (ui-workspace), and the foot is the
- * `sidebar.settings` registrant's (ui-settings), followed by optional footer
- * actions in `sidebar.footer.action`.
+ * `sidebar.brand.status` sits in the expanded brand row beside the brand,
+ * `sidebar.quickstart` sits directly under New Session, everything between the
+ * workspace section header and the list bottom is the `sidebar.workspaces`
+ * registrant's (ui-workspace), and the foot is the `sidebar.settings`
+ * registrant's (ui-settings), followed by optional footer actions in
+ * `sidebar.footer.action`.
  */
 import type { InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
@@ -26,10 +28,24 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      */
     'sidebar.brand.name': { kind: 'single'; scope: 'root'; owner: SidebarBrandNameOwnerProps }
     /**
+     * Status cells beside the brand. Declared by this package's `sidebar`
+     * entry; each occupant owns its own content and the shell only places it
+     * between the brand group and the column toggle. The seat exists in the
+     * expanded column only, where a cell can carry text.
+     */
+    'sidebar.brand.status': { kind: 'list'; scope: 'root'; owner: SidebarBrandStatusOwnerProps }
+    /**
      * Global panel icons. Each list id addresses the matching main panel;
      * the sidebar owns the button and resolves its label from list metadata.
      */
     'sidebar.panellist': { kind: 'list'; scope: 'root'; owner: SidebarPanelIconOwnerProps }
+    /**
+     * Launch actions directly under New Session: the ways into work that is
+     * not a blank session. Declared by this package's 'sidebar' entry; the
+     * occupant owns its own button set, and the shell passes only its column
+     * state. Absent a registrant the shell draws nothing here.
+     */
+    'sidebar.quickstart': { kind: 'single'; scope: 'root'; owner: SidebarQuickstartOwnerProps }
     /**
      * The workspace/session browsing region: section header, search, the
      * grouped/flat session list, and every workspace dialog. Declared by this
@@ -63,6 +79,12 @@ export interface SidebarBrandNameOwnerProps {
   children?: never
 }
 
+/** Empty owner share for a brand-status occupant. */
+export interface SidebarBrandStatusOwnerProps {
+  /** Marker field: the occupant owns its own content and width. */
+  children?: never
+}
+
 /** Icon presentation supplied by the global panel row. */
 export interface SidebarPanelIconOwnerProps {
   /** Requested square edge in pixels. */
@@ -79,6 +101,15 @@ export interface SidebarPanelMetadata {
   order: number
   /** Row title and accessible name: resolved label, or the id when omitted. */
   label: string
+}
+
+/**
+ * Owner share of the quick-start seat: the column display state its button
+ * set renders against (full rows vs rail icons).
+ */
+export interface SidebarQuickstartOwnerProps {
+  /** Whether the sidebar renders wide content (false = 56px rail). */
+  wide: boolean
 }
 
 /**
@@ -136,7 +167,9 @@ export type SidebarRootComponentProps =
   & PropsRenderSlots<
     | 'sidebar.brand.mark'
     | 'sidebar.brand.name'
+    | 'sidebar.brand.status'
     | 'sidebar.panellist'
+    | 'sidebar.quickstart'
     | 'sidebar.workspaces'
     | 'sidebar.settings'
     | 'sidebar.footer.action'
